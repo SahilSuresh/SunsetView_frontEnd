@@ -1,7 +1,9 @@
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 import { useState } from "react"; // Add this for state management
+import { ToastProvider, useToast } from "../contexts/AppContext";
+import { useNavigate } from "react-router-dom";
 
 export type RegisterFormData = {
   firstName: string;
@@ -12,6 +14,11 @@ export type RegisterFormData = {
 };
 
 const Register = () => {
+  const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const { showToast } = useToast();
+
+
   // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,12 +32,14 @@ const Register = () => {
 
   const mutation = useMutation({
     mutationFn: (data: RegisterFormData) => apiClient.register(data),
-    onSuccess: () => {
-        console.log("Registration successful");
+    onSuccess: async () => {
+        showToast({message: "Registration confirmed!", type:"SUCCESS"});
+        await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
+        navigate("/");
     },
     onError: (error: Error) => {
-        console.log(error.message);
-    }
+        showToast({ message: error.message, type: "ERROR" });
+    },
   });
 
   const onSubmit = handleSubmit((data) => {
@@ -174,3 +183,7 @@ const Register = () => {
 };
 
 export default Register;
+
+function useAppContext() {
+    throw new Error("Function not implemented.");
+}
