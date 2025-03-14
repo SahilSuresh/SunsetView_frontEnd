@@ -96,7 +96,7 @@ const SignIn = () => {
           className="bg-orange-600 text-white p-3 text-1xl font-bold hover:bg-orange-400 rounded-3xl"
           disabled={mutation.isPending}
         >
-          {mutation.isPending ? "Signin..." : "Login"}
+          {mutation.isPending ? "Login..." : "Login"}
         </button>
       </div>
     </form>

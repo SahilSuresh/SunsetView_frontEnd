@@ -1,61 +1,76 @@
 import { RegisterFormData } from "./pages/Register";
-import { LoginFormData } from "./pages/SignIn"
+import { LoginFormData } from "./pages/SignIn";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const register = async (formData: RegisterFormData) => {
-    const response = await fetch(`${API_BASE_URL}/api/users/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-    });
+  const response = await fetch(`${API_BASE_URL}/api/users/register`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
-    const responseBody = await response.json();
+  const responseBody = await response.json();
 
-    if(!response.ok) {
-        throw new Error(responseBody.message);
-    }
-}; 
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+};
 
 export const signIn = async (formData: LoginFormData) => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
-    })
-
-    const body = await response.json();
-    if(!response.ok) {
-        throw new Error(body.message);
-    }
-    return body;
-}
+  const body = await response.json();
+  if (!response.ok) {
+    throw new Error(body.message);
+  }
+  return body;
+};
 
 export const validateToken = async () => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/validate-token`, {
-        credentials: "include"
-    })
-    if(!response.ok) {
-        throw new Error('Invalid token')
-    }
+  const response = await fetch(`${API_BASE_URL}/api/auth/validate-token`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Invalid token");
+  }
 
-    return response.json();
+  return response.json();
 };
 
 //fetch the sign out
 export const signOut = async () => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
-        credentials: "include",
-        method: "POST",
-    });
+  const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+    credentials: "include",
+    method: "POST",
+  });
 
-    if(!response.ok) {
-        throw new Error("Error during sign out");
-    }
-}
+  if (!response.ok) {
+    throw new Error("Error during sign out");
+  }
+};
+
+//fetch the add hotel
+export const addHotel = async (formData: FormData) => {
+  const response = await fetch(`${API_BASE_URL}/api/my-hotels`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const body = await response.json();
+    throw new Error(body.message);
+  }
+  
+  return response.json();
+};

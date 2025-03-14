@@ -48,7 +48,7 @@ const Register = () => {
 
   return (
     <form className="flex flex-col gap-5" onSubmit={onSubmit}>
-      <h2 className="text-2xl font-bold mx-5">Create an Account</h2>
+      <h2 className="text-2xl font-bold mx-5">Set up an account</h2>
       
       {/* Display any API errors */}
       {mutation.isError && (

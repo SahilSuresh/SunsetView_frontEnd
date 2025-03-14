@@ -7,8 +7,11 @@ import {
 import Layout from "./interface/Interface";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
+import { useToast } from "./contexts/AppContext";
+import AddHotel from "./pages/AddHotel";
 
 const App = () => {
+  const {isLoggedIn} = useToast();
   return (
     <Router>
       <Routes>
@@ -45,6 +48,13 @@ const App = () => {
           }
         />
 
+        {isLoggedIn &&(<>
+        <Route path="/add-hotel" element={
+          <Layout>
+            <AddHotel />
+          </Layout>
+        }/>
+        </>)}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
