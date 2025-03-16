@@ -39,7 +39,7 @@ const Type = () => {
       
       {errors?.type && (
         <span className="text-red-500 text-sm font-bold mt-2 block">
-          {errors.type.message}
+          {errors.type.message?.toString()}
         </span>
       )}
     </div>

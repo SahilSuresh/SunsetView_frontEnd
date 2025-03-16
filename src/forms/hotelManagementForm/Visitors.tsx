@@ -32,11 +32,11 @@ const Visitors = () => {
             className="border rounded w-full py-2 px-3 font-normal bg-white"
             type="number"
             min={1}
-            {...register("adultsCount", { required: "Please enter the number of adults." })}
+            {...register("adultCount", { required: "Please enter the number of adults." })}
           />
-          {errors.adultsCount?.message && (
+          {errors.adultCount?.message && (
             <span className="text-red-500 text-sm font-bold">
-              {errors.adultsCount?.message}
+              {errors.adultCount?.message}
             </span>
           )}
         </label>

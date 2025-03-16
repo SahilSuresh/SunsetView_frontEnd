@@ -4,35 +4,53 @@ import Type from "./Type";
 import Facilities from "./Facilities";
 import Visitors from "./Visitors";
 import Images from "./Images";
-//data what will be inside my form.
+import { HotelType } from "../../../../backEnd/src/share/type";
+import { useEffect } from "react";
+
+// Define the data structure for the hotel form
 export type HotelFormData = {
+  id: string;
+  userId: string;
   name: string;
   city: string;
   country: string;
   description: string;
   type: string;
+  adultCount: number;
+  childrenCount: number;
+  facilities: string[];
   pricePerNight: number;
   rating: number;
-  facilities: string[];
-  imageFiles: FileList;
-  adultsCount: number;
-  childrenCount: number;
+  imageURL: string[]; // For existing image URLs
+  imageFiles?: FileList; // For new image files being uploaded (optional)
 };
 
-//On save props
+// Define props for the form component
 type Props = {
+  hotel?: HotelType; // Optional hotel data for editing
   onSave: (formData: FormData) => void;
-  isPending: boolean;
+  isPending: boolean; // Loading state
 };
 
-const HotelManagementForm = ({ onSave, isPending }: Props) => {
-  const formMethods = useForm<HotelFormData>(); // the reason I am doing it because I have broken our form up intp smaller components so in order to use form provider so the child component get access to all the react-hook-form methods
-  //all we going is react-hook-form is use HotelFormData type. Basic spreading all the properties of use form into hoteformdata
+const HotelManagementForm = ({ onSave, isPending, hotel }: Props) => {
+  // Initialize react-hook-form with our HotelFormData type
+  const formMethods = useForm<HotelFormData>();
+  const { handleSubmit, reset } = formMethods;
 
-  const { handleSubmit } = formMethods;
+  // Reset form with hotel data when available
+  useEffect(() => {
+    reset(hotel);
+  }, [hotel, reset]);
 
   const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
     const formData = new FormData();
+
+    // If editing an existing hotel, include the ID
+    if (hotel) {
+      formData.append("hotelId", hotel.id);
+    }
+
+    // Add all form fields to FormData
     formData.append("name", formDataJson.name);
     formData.append("city", formDataJson.city);
     formData.append("country", formDataJson.country);
@@ -40,17 +58,35 @@ const HotelManagementForm = ({ onSave, isPending }: Props) => {
     formData.append("type", formDataJson.type);
     formData.append("pricePerNight", formDataJson.pricePerNight.toString());
     formData.append("rating", formDataJson.rating.toString());
-    formData.append("adultCount", formDataJson.adultsCount.toString());
+    formData.append("adultCount", formDataJson.adultCount.toString());
     formData.append("childrenCount", formDataJson.childrenCount.toString());
 
+    // Add facilities as an array
     formDataJson.facilities.forEach((facility, index) => {
       formData.append(`facilities[${index}]`, facility);
     });
 
-    Array.from(formDataJson.imageFiles).forEach((imageFile) => {
-      formData.append(`imageFiles`, imageFile);
-    });
+    // First add existing image URLs (if any)
+    if (formDataJson.imageURL && formDataJson.imageURL.length > 0) {
+      formDataJson.imageURL.forEach((url, index) => {
+        formData.append(`imageURL[${index}]`, url);
+      });
+    }
 
+    // Then add new image files (if any)
+    if (formDataJson.imageFiles && formDataJson.imageFiles.length > 0) {
+      Array.from(formDataJson.imageFiles).forEach((imageFile) => {
+        formData.append("imageURL", imageFile);
+      });
+    }
+
+    // For debugging
+    console.log("Form data being submitted:");
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    // Call the save handler with the prepared FormData
     onSave(formData);
   });
 
@@ -69,7 +105,7 @@ const HotelManagementForm = ({ onSave, isPending }: Props) => {
             type="submit"
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2 rounded-full text-lg transition-colors duration-300 disabled:bg-gray-300"
           >
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? "Saving..." : "Save Hotel"}
           </button>
         </span>
       </form>
