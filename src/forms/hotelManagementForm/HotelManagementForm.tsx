@@ -6,22 +6,11 @@ import Visitors from "./Visitors";
 import Images from "./Images";
 import { HotelType } from "../../../../backEnd/src/share/type";
 import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-// Define the data structure for the hotel form
-export type HotelFormData = {
-  id: string;
-  userId: string;
-  name: string;
-  city: string;
-  country: string;
-  description: string;
-  type: string;
-  adultCount: number;
-  childrenCount: number;
-  facilities: string[];
-  pricePerNight: number;
-  rating: number;
-  imageURL: string[]; // For existing image URLs
+// Define the data structure for the hotel form - extending HotelType to include both ID formats
+export type HotelFormData = HotelType & {
+  _id?: string; // Add MongoDB's _id as optional
   imageFiles?: FileList; // For new image files being uploaded (optional)
 };
 
@@ -33,17 +22,48 @@ type Props = {
 };
 
 const HotelManagementForm = ({ onSave, isPending, hotel }: Props) => {
+  // Get hotelId from URL params if available
+  const { hotelId } = useParams();
+  
   // Initialize react-hook-form with our HotelFormData type
   const formMethods = useForm<HotelFormData>();
-  const { handleSubmit, reset } = formMethods;
+  const { handleSubmit, reset, watch, setValue } = formMethods;
+  
+  // For debugging
+  const imageURLs = watch("imageURL");
+  useEffect(() => {
+    console.log("Current imageURL state:", imageURLs);
+  }, [imageURLs]);
 
   // Reset form with hotel data when available
   useEffect(() => {
-    reset(hotel);
-  }, [hotel, reset]);
+    console.log("Resetting form with hotel data:", hotel);
+    if (hotel) {
+      // Make a copy of the hotel object to avoid modifying it directly
+      const formData = { ...hotel };
+      
+      // Explicitly set the ID to ensure it's available for the Images component
+      if (hotelId) {
+        formData.id = hotelId;
+      }
+      
+      reset(formData);
+    }
+  }, [hotel, reset, hotelId]);
+  
+  // Make sure the URL hotelId is available in the form
+  useEffect(() => {
+    if (hotelId) {
+      console.log("Setting hotel ID from URL:", hotelId);
+      setValue("id", hotelId);
+    }
+  }, [hotelId, setValue]);
 
   const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
     const formData = new FormData();
+
+    console.log("Form submitted with data:", formDataJson);
+    console.log("Current imageURL state before submitting:", formDataJson.imageURL);
 
     // If editing an existing hotel, include the ID
     if (hotel) {

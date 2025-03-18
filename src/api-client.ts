@@ -1,6 +1,7 @@
 import { RegisterFormData } from "./pages/Register";
 import { LoginFormData } from "./pages/SignIn";
 import { HotelType } from "../../backEnd/src/userModels/hotel";
+import { HotelQueryResponse } from "../../backEnd/src/share/type";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const register = async (formData: RegisterFormData) => {
@@ -116,3 +117,55 @@ export const updateHotel = async (hotelId: string, formData: FormData) => {
 
   return response.json();
 };
+
+// New function to delete a specific image from a hotel
+export const deleteHotelImage = async (hotelId: string, imageUrl: string) => {
+  console.log(`Deleting image: ${imageUrl} from hotel: ${hotelId}`);
+  const encodedImageUrl = encodeURIComponent(imageUrl);
+  const response = await fetch(
+    `${API_BASE_URL}/api/my-hotels/${hotelId}/images?imageUrl=${encodedImageUrl}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.json();
+    console.error("Delete image API error:", body);
+    throw new Error(body.message || "Failed to delete image");
+  }
+
+  const result = await response.json();
+  console.log("Delete image API response:", result);
+  return result;
+};
+
+// fetch request to called the search-end
+
+export type SearchParameter = {
+  destination?: string;
+  checkIn?: string;
+  checkOut?: string;
+  adultCount?: string;
+  childrenCount?: string;
+  page?: string;
+}
+
+export const searchHotels = async (params: SearchParameter): Promise<HotelQueryResponse> => {
+  const queryParameter = new URLSearchParams();
+  queryParameter.append("destination", params.destination || "") // if the destination is not provided, it will be empty
+  queryParameter.append("checkIn", params.checkIn || "");
+  queryParameter.append("checkOut", params.checkOut || "");  
+  queryParameter.append("adultCount", params.adultCount || "");
+  queryParameter.append("childrenCount", params.childrenCount || "");
+  queryParameter.append("page", params.page || ""); 
+
+  //make the fetch request
+  const response = await fetch(`${API_BASE_URL}/api/hotels/search?${queryParameter}`);
+  
+  if (!response.ok) {
+    throw new Error("Error fetching hotels");
+  }
+  return response.json();
+}

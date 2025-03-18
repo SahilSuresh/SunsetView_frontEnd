@@ -11,6 +11,7 @@ import { useToast } from "./contexts/AppContext";
 import AddHotel from "./pages/AddHotel";
 import MyHotel from "./pages/MyHotel";
 import EditHotel from "./pages/EditHotel";
+import Search from "./pages/Search";
 
 const App = () => {
   const { isLoggedIn } = useToast();
@@ -29,7 +30,7 @@ const App = () => {
           path="/search"
           element={
             <Layout>
-              <p>Home Page</p>
+              <Search />
             </Layout>
           }
         />

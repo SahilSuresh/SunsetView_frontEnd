@@ -1,6 +1,8 @@
+import { useState, type ChangeEvent, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { HotelFormData } from "./HotelManagementForm";
-import { useState, type ChangeEvent, useEffect } from "react";
+import * as apiClient from "../../api-client";
+import { useParams } from "react-router-dom";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB in bytes
 
@@ -10,14 +12,21 @@ const Images = () => {
     setError,
     clearErrors,
     watch,
-    setValue
+    setValue,
+    getValues
   } = useFormContext<HotelFormData>();
+  
+  // Get URL params to extract hotel ID
+  const { hotelId: urlHotelId } = useParams<{ hotelId: string }>();
   
   const [fileNames, setFileNames] = useState<string>("No file chosen");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
   
   // Watch the current value to show existing images
   const existingImages = watch("imageURL");
+  const formHotelId = watch("id");
   
   // Effect to handle existing images on first load
   useEffect(() => {
@@ -28,11 +37,56 @@ const Images = () => {
   }, [existingImages, selectedFiles.length]);
   
   // Delete image function
-  const handleDeleteImage = (index: number) => {
-    if (existingImages && existingImages.length > 0) {
-      const newImages = [...existingImages];
-      newImages.splice(index, 1);
-      setValue("imageURL", newImages);
+  const handleDeleteImage = async (index: number, imageUrl: string) => {
+    try {
+      setIsDeleting(true);
+      setDeletingIndex(index);
+      
+      console.log("Deleting image:", imageUrl);
+      
+      // Get hotel ID from different sources
+      const effectiveHotelId = formHotelId || urlHotelId;
+      console.log("Using hotel ID for deletion:", effectiveHotelId);
+      
+      // Make API call to delete the image from backend
+      if (effectiveHotelId) {
+        const result = await apiClient.deleteHotelImage(effectiveHotelId, imageUrl);
+        console.log("Delete result:", result);
+        
+        // Update local state after successful deletion
+        if (existingImages && existingImages.length > 0) {
+          // Use the updated image array returned from the server
+          if (result.updatedImageURLs) {
+            setValue("imageURL", result.updatedImageURLs);
+            console.log("Updated form with server image array:", result.updatedImageURLs);
+          } else {
+            // Fallback to local update if server doesn't return updated array
+            const newImages = [...existingImages];
+            newImages.splice(index, 1);
+            setValue("imageURL", newImages);
+            console.log("Updated form with locally modified array:", newImages);
+          }
+        }
+      } else {
+        console.log("No hotel ID available - performing local update only");
+        // Just update locally since we couldn't get the hotel ID
+        if (existingImages && existingImages.length > 0) {
+          const newImages = [...existingImages];
+          newImages.splice(index, 1);
+          setValue("imageURL", newImages);
+          console.log("Updated form locally only:", newImages);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      // Show error to user
+      setError("imageURL", { 
+        type: "manual", 
+        message: error instanceof Error ? error.message : "Failed to delete image. Please try again." 
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeletingIndex(null);
     }
   };
   
@@ -186,10 +240,11 @@ const Images = () => {
                   />
                   <button
                     type="button"
-                    onClick={() => handleDeleteImage(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleDeleteImage(index, image)}
+                    disabled={isDeleting && deletingIndex === index}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:bg-gray-400"
                   >
-                    ✕
+                    {isDeleting && deletingIndex === index ? "..." : "✕"}
                   </button>
                 </div>
               )
