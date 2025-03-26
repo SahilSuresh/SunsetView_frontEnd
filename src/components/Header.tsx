@@ -13,7 +13,7 @@ const Header = () => {
   };
 
   return (
-    <div className="bg-orange-600 py-4 px-4 sm:py-6 sm:px-6 sticky top-0 z-50 shadow-md">
+    <div className="bg-gradient-to-r from-orange-300 to-orange-500 py-4 px-4 sm:py-6 sm:px-6 sticky top-0 z-50 shadow-md">
       <div className="container mx-auto flex flex-wrap items-center justify-between max-w-7xl">
         {/* Logo */}
         <span className="text-2xl sm:text-3xl text-white font-bold">
@@ -35,13 +35,13 @@ const Header = () => {
             <>
               <Link
                 to="/my-bookings"
-                className="flex items-center text-white px-4 py-2 font-bold hover:bg-orange-500 transition-colors rounded-full"
+                className="flex items-center text-white px-4 py-2 font-bold hover:bg-white hover:text-orange-500 transition-colors rounded-full border border-white/30"
               >
                 My Bookings
               </Link>
               <Link
                 to="/my-hotel"
-                className="flex items-center text-white px-4 py-2 font-bold hover:bg-orange-500 transition-colors rounded-full"
+                className="flex items-center text-white px-4 py-2 font-bold hover:bg-white hover:text-orange-500 transition-colors rounded-full border border-white/30"
               >
                 My Hotels
               </Link>
@@ -50,7 +50,7 @@ const Header = () => {
           ) : (
             <Link
               to="/sign-in"
-              className="flex bg-white items-center text-orange-600 px-4 py-2 font-bold hover:bg-orange-500 hover:text-white transition-colors rounded-full"
+              className="flex bg-white items-center text-orange-600 px-5 py-2 font-bold hover:bg-orange-50 transition-colors rounded-full shadow-sm"
             >
               Sign In
             </Link>
@@ -59,31 +59,33 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="w-full md:hidden mt-4 bg-orange-700 rounded-lg overflow-hidden">
+          <div className="w-full md:hidden mt-4 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 shadow-lg">
             {isLoggedIn ? (
               <div className="flex flex-col">
                 <Link
                   to="/my-bookings"
-                  className="text-white px-4 py-3 font-bold hover:bg-orange-600 border-b border-orange-600"
+                  className="text-white px-4 py-3 font-bold hover:bg-white/25 border-b border-white/20 transition-colors"
                   onClick={toggleMenu}
                 >
                   My Bookings
                 </Link>
                 <Link
                   to="/my-hotel"
-                  className="text-white px-4 py-3 font-bold hover:bg-orange-600 border-b border-orange-600"
+                  className="text-white px-4 py-3 font-bold hover:bg-white/25 border-b border-white/20 transition-colors"
                   onClick={toggleMenu}
                 >
                   My Hotels
                 </Link>
-                <div className="px-4 py-3">
-                  <SignOutButton />
+                <div className="hover:bg-white/25 transition-colors">
+                  <div className="px-4 py-3">
+                    <SignOutButton />
+                  </div>
                 </div>
               </div>
             ) : (
               <Link
                 to="/sign-in"
-                className="block text-white px-4 py-3 font-bold hover:bg-orange-600"
+                className="block text-white px-4 py-3 font-bold hover:bg-white/25 transition-colors"
                 onClick={toggleMenu}
               >
                 Sign In

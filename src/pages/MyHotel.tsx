@@ -24,7 +24,7 @@ const MyHotel = () => {
         <span className="text-xl">No Hotels Found</span>
         <Link
           to="/add-hotel"
-          className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold hover:bg-orange-400 transition-colors"
+          className="bg-gradient-to-r from-orange-300 to-orange-500 text-white px-4 py-2 rounded-full font-bold hover:from-orange-400 hover:to-orange-600 transition-colors shadow-sm"
         >
           Add Your First Hotel
         </Link>
@@ -38,7 +38,7 @@ const MyHotel = () => {
         <h1 className="text-2xl sm:text-3xl font-bold">My Hotels</h1>
         <Link
           to="/add-hotel"
-          className="flex items-center justify-center bg-orange-500 rounded-full text-white font-bold px-4 py-2 hover:bg-orange-400 transition-colors self-start sm:self-auto"
+          className="flex items-center justify-center bg-gradient-to-r from-orange-300 to-orange-500 rounded-full text-white font-bold px-4 py-2 hover:from-orange-400 hover:to-orange-600 transition-colors self-start sm:self-auto shadow-sm"
         >
           Add Hotel
         </Link>
@@ -90,9 +90,9 @@ const MyHotel = () => {
             <div className="flex justify-end mt-2">
               <Link
                 to={`/edit-hotel/${hotel.id || hotel._id}`}
-                className="bg-orange-500 rounded-full text-white font-medium px-4 py-2 text-sm hover:bg-orange-400 transition-colors"
+                className="bg-gradient-to-r from-orange-300 to-orange-500 rounded-full text-white font-medium px-4 py-2 text-sm hover:from-orange-400 hover:to-orange-600 transition-colors shadow-sm"
               >
-                View Details
+                Edit Details
               </Link>
             </div>
           </div>

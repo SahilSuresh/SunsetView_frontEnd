@@ -176,8 +176,8 @@ const Images = () => {
   return (
     <div className="mb-10">
       <h2 className="text-2xl font-bold mb-3">Images</h2>
-      <div className="p-4 border rounded flex items-center gap-3">
-        <label className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded cursor-pointer border border-gray-300 text-gray-700">
+      <div className="p-4 border border-orange-200 rounded flex items-center gap-3">
+        <label className="bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 px-4 py-2 rounded cursor-pointer text-white shadow-sm transition-colors">
           Add Images
           <input
             type="file"
@@ -207,12 +207,12 @@ const Images = () => {
                 <img 
                   src={URL.createObjectURL(file)} 
                   alt={`Selected image ${index + 1}`} 
-                  className="w-36 h-36 object-cover rounded border border-gray-300"
+                  className="w-36 h-36 object-cover rounded border border-orange-200"
                 />
                 <button
                   type="button"
                   onClick={() => handleDeleteSelectedFile(index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ✕
                 </button>
@@ -236,13 +236,13 @@ const Images = () => {
                   <img 
                     src={image} 
                     alt={`Hotel image ${index + 1}`} 
-                    className="w-36 h-36 object-cover rounded border border-gray-300"
+                    className="w-36 h-36 object-cover rounded border border-orange-200"
                   />
                   <button
                     type="button"
                     onClick={() => handleDeleteImage(index, image)}
                     disabled={isDeleting && deletingIndex === index}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:bg-gray-400"
+                    className="absolute top-2 right-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:bg-gray-400"
                   >
                     {isDeleting && deletingIndex === index ? "..." : "✕"}
                   </button>

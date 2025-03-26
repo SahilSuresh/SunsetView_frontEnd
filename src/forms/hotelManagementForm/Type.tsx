@@ -20,8 +20,8 @@ const Type = () => {
             className={`
               cursor-pointer rounded-full px-4 py-2 text-center transition-colors duration-200
               ${typeWatch === type 
-                ? "bg-orange-500 text-white font-semibold shadow-md" 
-                : "bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium"}
+                ? "bg-gradient-to-r from-orange-300 to-orange-500 text-white font-semibold shadow-md" 
+                : "bg-white border border-orange-200 hover:bg-orange-50 text-gray-700 font-medium"}
             `}
           >
             <input

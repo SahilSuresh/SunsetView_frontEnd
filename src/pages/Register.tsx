@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 import { useState } from "react";
 import { useToast } from "../contexts/AppContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export type RegisterFormData = {
   firstName: string;
@@ -170,10 +170,15 @@ const Register = () => {
           )}
         </label>
 
-        <div className="pt-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center pt-2">
+          <div className="flex flex-col">
+            <span className="text-sm">Already registered?</span>
+            <Link className="text-sm underline text-orange-600" to="/sign-in">Sign in here</Link>
+          </div>
+          
           <button
             type="submit" 
-            className="bg-orange-600 text-white p-3 text-base font-bold hover:bg-orange-400 rounded-3xl w-full sm:w-auto sm:px-6"
+            className="bg-gradient-to-r from-orange-300 to-orange-500 text-white p-3 text-base font-bold hover:from-orange-400 hover:to-orange-600 rounded-3xl w-full sm:w-auto sm:px-6 transition-colors shadow-sm"
             disabled={mutation.isPending}>
             {mutation.isPending ? "Creating Account..." : "Create Account"}
           </button>

@@ -1,6 +1,6 @@
 import { RegisterFormData } from "./pages/Register";
 import { LoginFormData } from "./pages/SignIn";
-import { HotelType } from "../../backEnd/src/userModels/hotel";
+import { HotelType } from "../../backEnd/src/share/type";
 import { HotelQueryResponse } from "../../backEnd/src/share/type";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -143,6 +143,7 @@ export const deleteHotelImage = async (hotelId: string, imageUrl: string) => {
 
 // fetch request to called the search-end
 
+// Update the SearchParameter type
 export type SearchParameter = {
   destination?: string;
   checkIn?: string;
@@ -150,22 +151,100 @@ export type SearchParameter = {
   adultCount?: string;
   childrenCount?: string;
   page?: string;
+  // New filters
+  rating?: string;
+  type?: string | string[]; // Allow multiple hotel types
+  facilities?: string[];
+  sortOption?: 'ratingHighToLow' | 'pricePerNightLowToHigh' | 'pricePerNightHighToLow';
 }
 
+// Updated searchHotels function with improved error handling
 export const searchHotels = async (params: SearchParameter): Promise<HotelQueryResponse> => {
   const queryParameter = new URLSearchParams();
-  queryParameter.append("destination", params.destination || "") // if the destination is not provided, it will be empty
+  
+  // Add existing parameters
+  queryParameter.append("destination", params.destination || "");
   queryParameter.append("checkIn", params.checkIn || "");
   queryParameter.append("checkOut", params.checkOut || "");  
   queryParameter.append("adultCount", params.adultCount || "");
   queryParameter.append("childrenCount", params.childrenCount || "");
   queryParameter.append("page", params.page || ""); 
-
-  //make the fetch request
-  const response = await fetch(`${API_BASE_URL}/api/hotels/search?${queryParameter}`);
   
-  if (!response.ok) {
-    throw new Error("Error fetching hotels");
+  // Add new filter parameters
+  if (params.rating) {
+    queryParameter.append("rating", params.rating);
   }
+  
+  // Handle hotel type (can be string or array)
+  if (params.type) {
+    if (Array.isArray(params.type)) {
+      // Handle multiple hotel types
+      params.type.forEach(type => {
+        queryParameter.append("type", type);
+      });
+    } else {
+      // Handle single hotel type
+      queryParameter.append("type", params.type);
+    }
+  }
+  
+  // Handle facilities array
+  if (params.facilities && params.facilities.length > 0) {
+    params.facilities.forEach(facility => {
+      queryParameter.append("facilities", facility);
+    });
+  }
+  
+  // Add sort option
+  if (params.sortOption) {
+    queryParameter.append("sortOption", params.sortOption);
+  }
+
+  // Log for debugging
+  console.log("Sending search request with params:", params);
+  console.log("Query string:", queryParameter.toString());
+
+  try {
+    // Make the fetch request with timeout to avoid hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    
+    const response = await fetch(`${API_BASE_URL}/api/hotels/search?${queryParameter}`, {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Add additional logging for debugging
+    if (data && data.data && data.data.length > 0) {
+      console.log("Sample price data:", data.data.map((h: any) => ({ 
+        name: h.name, 
+        price: h.pricePerNight,
+        type: typeof h.pricePerNight
+      })));
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Search hotels error:", error);
+    throw error;
+  }
+}
+
+
+export const getHotelByIdBook = async(hotelId: string): Promise<HotelType>=> {
+  const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelId}`);
+
+  if(!response.ok) {
+    throw new Error("Error fetching hotel by id");
+  }
+
   return response.json();
 }

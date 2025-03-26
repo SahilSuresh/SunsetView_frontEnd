@@ -124,14 +124,14 @@ const SearchBar = () => {
       <div className="flex justify-center mt-4 gap-3">
         <button 
           type="submit"
-          className="bg-gradient-to-r from-orange-600 to-orange-700 text-white font-bold px-6 py-2 rounded-full hover:from-orange-500 hover:to-orange-600 transition-colors shadow-md"
+          className="bg-gradient-to-r from-orange-300 to-orange-500 text-white font-bold px-6 py-2 rounded-full hover:from-orange-400 hover:to-orange-600 transition-colors shadow-md"
         >
           Find Hotels
         </button>
         <button 
           type="button"
           onClick={handleClear}
-          className="bg-white text-orange-600 border border-orange-600 font-bold px-4 py-2 rounded-full hover:bg-orange-50 transition-colors"
+          className="bg-white text-orange-500 border border-orange-400 font-bold px-4 py-2 rounded-full hover:bg-orange-50 transition-colors"
         >
           Clear
         </button>

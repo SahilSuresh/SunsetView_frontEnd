@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 import { useToast } from "../contexts/AppContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export type LoginFormData = {
   email: string;
@@ -14,6 +14,7 @@ const SignIn = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const location = useLocation();
 
   // State for password visibility
   const [showPassword, setShowPassword] = useState(false);
@@ -29,9 +30,9 @@ const SignIn = () => {
     onSuccess: async () => {
       showToast({ message: "Sign in Successful!", type: "SUCCESS" });
       await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
-      navigate("/");
+      navigate(location.state?.from?.pathname || "/");
     },
-    onError: (error: Error) => {
+    onError: () => {
       showToast({ message: "Sign in Unsuccessful!", type: "ERROR" });
     },
   });
@@ -94,7 +95,7 @@ const SignIn = () => {
           
           <button
             type="submit"
-            className="bg-orange-600 text-white p-3 text-base font-bold hover:bg-orange-400 rounded-3xl w-full sm:w-auto sm:px-6"
+            className="bg-gradient-to-r from-orange-300 to-orange-500 text-white p-3 text-base font-bold hover:from-orange-400 hover:to-orange-600 rounded-3xl w-full sm:w-auto sm:px-6 transition-colors shadow-sm"
             disabled={mutation.isPending}
           >
             {mutation.isPending ? "Login..." : "Login"}

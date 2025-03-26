@@ -22,14 +22,14 @@ const SearchCard = ({ hotel }: Props) => {
           <div className="flex items-center mb-1">
             <span className="flex">
               {Array.from({ length: hotel.rating }).map((_, index) => (
-                <AiFillStar key={index} className="fill-yellow-400" />
+                <AiFillStar key={index} className="fill-orange-400" />
               ))}
             </span>
             <span className="ml-1 text-xs sm:text-sm text-gray-600">{hotel.type}</span>
           </div>
           <Link
             to={`/detail/${hotel._id}`}
-            className="text-xl sm:text-2xl font-bold cursor-pointer text-gray-800 hover:text-orange-600 transition-colors"
+            className="text-xl sm:text-2xl font-bold cursor-pointer text-gray-800 hover:text-orange-500 transition-colors"
           >
             {hotel.name}
           </Link>
@@ -42,12 +42,12 @@ const SearchCard = ({ hotel }: Props) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <div className="flex flex-wrap gap-1 items-center">
             {hotel.facilities.slice(0, 3).map((facility, index) => (
-              <span key={index} className="bg-gray-100 p-1 sm:p-2 rounded-lg text-xs whitespace-nowrap">
+              <span key={index} className="bg-orange-50 border border-orange-100 p-1 sm:p-2 rounded-lg text-xs text-orange-700 whitespace-nowrap">
                 {facility}
               </span>
             ))}
             {hotel.facilities.length > 3 && (
-              <span className="text-xs sm:text-sm text-gray-600">
+              <span className="text-xs sm:text-sm text-orange-500">
                 +{hotel.facilities.length - 3} more
               </span>
             )}
@@ -57,7 +57,7 @@ const SearchCard = ({ hotel }: Props) => {
             <span className="font-bold text-gray-800">£{hotel.pricePerNight} <span className="text-sm font-normal text-gray-600">per night</span></span>
             <Link
               to={`/detail/${hotel._id}`}
-              className="bg-gradient-to-r from-orange-600 to-orange-700 text-white py-2 px-4 rounded-full font-bold text-sm sm:text-base hover:from-orange-500 hover:to-orange-600 transition-colors shadow-md text-center"
+              className="bg-gradient-to-r from-orange-300 to-orange-500 text-white py-2 px-4 rounded-full font-bold text-sm sm:text-base hover:from-orange-400 hover:to-orange-600 transition-colors shadow-md text-center"
             >
               View Details
             </Link>

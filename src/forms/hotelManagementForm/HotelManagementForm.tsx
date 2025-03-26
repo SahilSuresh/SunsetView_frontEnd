@@ -123,7 +123,7 @@ const HotelManagementForm = ({ onSave, isPending, hotel }: Props) => {
           <button
             disabled={isPending}
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2 rounded-full text-lg transition-colors duration-300 disabled:bg-gray-300"
+            className="bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 text-white font-bold px-6 py-2 rounded-full text-lg transition-colors duration-300 disabled:bg-gray-300 shadow-md"
           >
             {isPending ? "Saving..." : "Save Hotel"}
           </button>

@@ -15,12 +15,12 @@ const Facilities = () => {
         {hotelFacilities.map((facility) => (
           <label 
             key={facility} 
-            className="bg-white border border-gray-300 rounded px-3 py-2 flex items-center gap-2 hover:bg-gray-50"
+            className="bg-white border border-orange-200 rounded px-3 py-2 flex items-center gap-2 hover:bg-orange-50 transition-colors"
           >
             <input
               type="checkbox"
               value={facility}
-              className="h-4 w-4 accent-orange-300 focus:ring-orange-300"
+              className="h-4 w-4 accent-orange-400 focus:ring-orange-300"
               {...register("facilities", {
                 validate: (facilities) => {
                   if (facilities && facilities.length > 0) {

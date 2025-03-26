@@ -12,6 +12,7 @@ import AddHotel from "./pages/AddHotel";
 import MyHotel from "./pages/MyHotel";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
+import DetailSec from "./pages/DetailSec";
 
 const App = () => {
   const { isLoggedIn } = useToast();
@@ -34,6 +35,17 @@ const App = () => {
             </Layout>
           }
         />
+
+        <Route
+          path="/detail/:hotelId"
+          element={
+            <Layout>
+              <DetailSec />
+            </Layout>
+          }
+        />
+
+
         <Route
           path="/register"
           element={
