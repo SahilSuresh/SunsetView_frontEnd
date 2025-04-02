@@ -1,23 +1,34 @@
-import React, { Children, useContext } from "react";
+import React, { useContext, useState } from "react";
 import Toast from "../components/Toast";
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from '../api-client';
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+
+// Get Stripe publishable key from environment variables
+const stripePublishableKey = import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY || "";
+
+// Define types for toast messages
 type ToastMessage = {
   message: string;
   type: "SUCCESS" | "ERROR";
 };
 
+// Define context type
 type AppContext = {
   showToast: (toastMessage: ToastMessage) => void;
   isLoggedIn: boolean;
+  stripePromise: Promise<Stripe | null>;
 };
 
+// Create context
 const AppContext = React.createContext<AppContext | undefined>(undefined);
 
+// Initialize Stripe promise once to avoid recreating it on every render
+const stripePromise = loadStripe(stripePublishableKey);
+
+// Main toast and auth provider
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-  const [toastMessage, setToastMessage] = React.useState<
-    ToastMessage | undefined
-  >(undefined);
+  const [toastMessage, setToastMessage] = useState<ToastMessage | undefined>(undefined);
 
   const { isError } = useQuery({
     queryKey: ["validateToken"],
@@ -28,10 +39,11 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AppContext.Provider
       value={{
-        showToast: (toastMessage) => {
-          setToastMessage(toastMessage);
+        showToast: (message: ToastMessage) => {
+          setToastMessage(message);
         },
         isLoggedIn: !isError,
+        stripePromise
       }}
     >
       {toastMessage && (
@@ -46,7 +58,11 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Hook to use the app context
 export const useToast = () => {
   const context = useContext(AppContext);
-  return context as AppContext;
+  if (!context) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
+  return context;
 };

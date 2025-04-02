@@ -47,7 +47,7 @@ const MyHotel = () => {
       <div className="grid grid-cols-1 gap-6">
         {hotelData.map((hotel) => (
           <div 
-            key={hotel.id} 
+            key={hotel._id || hotel.id} // Using either _id or id as the unique key
             className="flex flex-col border border-slate-300 rounded-lg p-4 sm:p-6 gap-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <h2 className="text-xl sm:text-2xl font-bold">{hotel.name}</h2>
@@ -89,7 +89,7 @@ const MyHotel = () => {
             
             <div className="flex justify-end mt-2">
               <Link
-                to={`/edit-hotel/${hotel.id || hotel._id}`}
+                to={`/edit-hotel/${hotel._id || hotel.id}`}
                 className="bg-gradient-to-r from-orange-300 to-orange-500 rounded-full text-white font-medium px-4 py-2 text-sm hover:from-orange-400 hover:to-orange-600 transition-colors shadow-sm"
               >
                 Edit Details

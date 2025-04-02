@@ -3,6 +3,7 @@ import {
   Route,
   Routes,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Layout from "./interface/Interface";
 import Register from "./pages/Register";
@@ -13,9 +14,20 @@ import MyHotel from "./pages/MyHotel";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import DetailSec from "./pages/DetailSec";
+import Booking from "./pages/Booking";
 
 const App = () => {
   const { isLoggedIn } = useToast();
+  
+  // Create a wrapper component that can access location for redirects
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    const location = useLocation();
+    if (!isLoggedIn) {
+      return <Navigate to="/sign-in" state={{ from: location }} />;
+    }
+    return <>{children}</>;
+  };
+  
   return (
     <Router>
       <Routes>
@@ -45,7 +57,6 @@ const App = () => {
           }
         />
 
-
         <Route
           path="/register"
           element={
@@ -63,6 +74,19 @@ const App = () => {
           }
         />
 
+        {/* Hotel booking route - protected but with cleaner way to pass location */}
+        <Route
+          path="/hotel/:hotelId/booking"
+          element={
+            <Layout>
+              <ProtectedRoute>
+                <Booking />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        {/* Other protected routes */}
         {isLoggedIn && (
           <>
             <Route

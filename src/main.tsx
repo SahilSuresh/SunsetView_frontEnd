@@ -1,3 +1,19 @@
+// Suppress Stripe analytics error in dev only
+if (import.meta.env.DEV) {
+  const originalFetch = window.fetch;
+
+  window.fetch = async (...args) => {
+    const [resource] = args;
+    if (typeof resource === "string" && resource.includes("r.stripe.com")) {
+      // Return a fake response to avoid console error
+      return new Response(null, { status: 204 });
+    }
+    return originalFetch(...args);
+  };
+}
+
+
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
