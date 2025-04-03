@@ -15,10 +15,12 @@ import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import DetailSec from "./pages/DetailSec";
 import Booking from "./pages/Booking";
+import MyBooking from "./pages/MyBooking";
+import Home from "./pages/Home";
 
 const App = () => {
   const { isLoggedIn } = useToast();
-  
+
   // Create a wrapper component that can access location for redirects
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();
@@ -27,7 +29,7 @@ const App = () => {
     }
     return <>{children}</>;
   };
-  
+
   return (
     <Router>
       <Routes>
@@ -35,7 +37,7 @@ const App = () => {
           path="/"
           element={
             <Layout>
-              <p>Home Page</p>
+              <Home />
             </Layout>
           }
         />
@@ -112,6 +114,15 @@ const App = () => {
               element={
                 <Layout>
                   <MyHotel />
+                </Layout>
+              }
+            />
+
+            <Route
+              path="/my-Bookings"
+              element={
+                <Layout>
+                  <MyBooking />
                 </Layout>
               }
             />
