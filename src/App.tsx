@@ -18,6 +18,14 @@ import Booking from "./pages/Booking";
 import MyBooking from "./pages/MyBooking";
 import Home from "./pages/Home";
 
+// Footer pages for "Explore" and "Company" sections
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
+import Careers from "./pages/Careers";
+import AllHotels from "./pages/AllHotels";
+import FeaturedStays from "./pages/FeaturedStays";
+import TrendingDestinations from "./pages/TrendingDestinations";
+
 const App = () => {
   const { isLoggedIn } = useToast();
 
@@ -76,7 +84,7 @@ const App = () => {
           }
         />
 
-        {/* Hotel booking route - protected but with cleaner way to pass location */}
+        {/* Hotel booking route - protected with location handling */}
         <Route
           path="/hotel/:hotelId/booking"
           element={
@@ -119,7 +127,7 @@ const App = () => {
             />
 
             <Route
-              path="/my-Bookings"
+              path="/my-bookings"
               element={
                 <Layout>
                   <MyBooking />
@@ -128,6 +136,61 @@ const App = () => {
             />
           </>
         )}
+
+        {/* Footer Pages - Explore Section */}
+        <Route
+          path="/hotels"
+          element={
+            <Layout>
+              <AllHotels />
+            </Layout>
+          }
+        />
+        <Route
+          path="/featured"
+          element={
+            <Layout>
+              <FeaturedStays />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/trending"
+          element={
+            <Layout>
+              <TrendingDestinations />
+            </Layout>
+          }
+        />
+
+        {/* Footer Pages - Company Section */}
+        <Route
+          path="/about"
+          element={
+            <Layout>
+              <AboutUs />
+            </Layout>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <Layout>
+              <Contact />
+            </Layout>
+          }
+        />
+        <Route
+          path="/careers"
+          element={
+            <Layout>
+              <Careers />
+            </Layout>
+          }
+        />
+
+        {/* Note: Privacy Policy, Terms of Service, and Cookie Policy are now handled by modals instead of routes */}
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
