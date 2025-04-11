@@ -13,7 +13,10 @@ const MyHotel = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <span className="text-lg">Loading hotels...</span>
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="mt-4 text-lg text-gray-700">Loading hotels...</span>
+        </div>
       </div>
     );
   }
@@ -87,7 +90,22 @@ const MyHotel = () => {
               </div>
             </div>
             
-            <div className="flex justify-end mt-2">
+            {/* Booking Info - Display the number of bookings */}
+            {hotel.bookings && hotel.bookings.length > 0 && (
+              <div className="mt-2 bg-green-50 border border-green-200 rounded-md p-3">
+                <p className="text-green-700 font-medium">
+                  {hotel.bookings.length} {hotel.bookings.length === 1 ? 'booking' : 'bookings'} for this hotel
+                </p>
+              </div>
+            )}
+            
+            <div className="flex justify-end mt-2 gap-3">
+              <Link
+                to={`/hotel-bookings/${hotel._id || hotel.id}`}
+                className="bg-blue-500 hover:bg-blue-600 rounded-full text-white font-medium px-4 py-2 text-sm transition-colors shadow-sm"
+              >
+                View Bookings
+              </Link>
               <Link
                 to={`/edit-hotel/${hotel._id || hotel.id}`}
                 className="bg-gradient-to-r from-orange-300 to-orange-500 rounded-full text-white font-medium px-4 py-2 text-sm hover:from-orange-400 hover:to-orange-600 transition-colors shadow-sm"

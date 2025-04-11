@@ -16,14 +16,8 @@ const SignIn = () => {
   const queryClient = useQueryClient();
   const location = useLocation();
   
-  // State for unverified user email (for resend verification option)
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-  
   // State for password visibility
   const [showPassword, setShowPassword] = useState(false);
-  
-  // State for resend verification loading
-  const [resendingVerification, setResendingVerification] = useState(false);
 
   const {
     register,
@@ -39,42 +33,12 @@ const SignIn = () => {
     onSuccess: async () => {
       showToast({ message: "Sign in Successful!", type: "SUCCESS" });
       await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
-      // Reset unverified email if login is successful
-      setUnverifiedEmail(null);
       navigate(location.state?.from?.pathname || "/");
     },
-    onError: (error: Error, variables) => {
-      // Check if the error response indicates email verification required
-      if (error.message.includes("verify your email")) {
-        setUnverifiedEmail(variables.email);
-        showToast({ message: error.message, type: "ERROR" });
-      } else {
-        setUnverifiedEmail(null);
-        showToast({ message: "Invalid email or password", type: "ERROR" });
-      }
+    onError: (error: Error) => {
+      showToast({ message: "Invalid email or password", type: "ERROR" });
     },
   });
-  
-  // Resend verification email mutation
-  const handleResendVerification = async () => {
-    if (!unverifiedEmail) return;
-    
-    setResendingVerification(true);
-    try {
-      await apiClient.resendVerificationEmail(unverifiedEmail);
-      showToast({ 
-        message: "Verification email sent. Please check your inbox.", 
-        type: "SUCCESS" 
-      });
-    } catch (error) {
-      showToast({ 
-        message: error instanceof Error ? error.message : "Failed to resend verification email", 
-        type: "ERROR" 
-      });
-    } finally {
-      setResendingVerification(false);
-    }
-  };
 
   const onSubmit = handleSubmit((data) => {
     mutation.mutate(data);
@@ -84,23 +48,6 @@ const SignIn = () => {
     <div className="max-w-md mx-auto px-4 sm:px-6 py-8">
       <form className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-6" onSubmit={onSubmit}>
         <h2 className="text-2xl sm:text-3xl font-bold">Sign In</h2>
-
-        {unverifiedEmail && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-2">
-            <h3 className="text-sm font-medium text-yellow-800 mb-1">Email verification required</h3>
-            <p className="text-sm text-yellow-700 mb-2">
-              Please verify your email address before signing in.
-            </p>
-            <button
-              type="button"
-              onClick={handleResendVerification}
-              disabled={resendingVerification}
-              className="text-sm font-medium text-yellow-800 hover:text-yellow-900 underline"
-            >
-              {resendingVerification ? "Sending..." : "Resend verification email"}
-            </button>
-          </div>
-        )}
 
         <label className="text-gray-700 text-sm font-bold flex-1">
           Email

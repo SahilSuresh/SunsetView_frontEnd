@@ -458,3 +458,19 @@ export const getBookings = async (): Promise<HotelType[]> => {
 
   return response.json();
 };
+
+
+// Add this function to your api-client.ts file
+
+export const getHotelBookings = async (hotelId: string): Promise<HotelType> => {
+  const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}/bookings`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+    throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
+};

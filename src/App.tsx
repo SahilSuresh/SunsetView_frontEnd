@@ -29,6 +29,7 @@ import Careers from "./pages/Careers";
 import AllHotels from "./pages/AllHotels";
 import FeaturedStays from "./pages/FeaturedStays";
 import TrendingDestinations from "./pages/TrendingDestinations";
+import HotelBookings from "./pages/HotelBookings ";
 
 const App = () => {
   const { isLoggedIn } = useToast();
@@ -87,9 +88,9 @@ const App = () => {
             </Layout>
           }
         />
-        
+
         {/* New authentication routes */}
-        
+
         <Route
           path="/forgot-password"
           element={
@@ -154,6 +155,15 @@ const App = () => {
               element={
                 <Layout>
                   <MyBooking />
+                </Layout>
+              }
+            />
+
+            <Route
+              path="/hotel-bookings/:hotelId"
+              element={
+                <Layout>
+                  <HotelBookings />
                 </Layout>
               }
             />

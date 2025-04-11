@@ -13,8 +13,15 @@ const SignOutButton = ({ className = "" }: SignOutButtonProps) => {
     const mutation = useMutation({
         mutationFn: apiClient.signOut,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
+            // First, remove the validateToken query from cache 
+            // instead of invalidating it
+            queryClient.removeQueries({ queryKey: ["validateToken"] });
+            
+            // Then show the toast message
             showToast({ message: "Signed Out!", type: "SUCCESS" });
+            
+            // Optionally, you can set a default value for the validateToken query
+            queryClient.setQueryData(["validateToken"], { isAuthenticated: false });
         },
         onError: (error: Error) => {
             showToast({ message: error.message, type: "ERROR" });
@@ -25,7 +32,6 @@ const SignOutButton = ({ className = "" }: SignOutButtonProps) => {
         mutation.mutate();
     };
 
-    // Use provided className or default styling
     return (
         <button 
             onClick={handleClick}

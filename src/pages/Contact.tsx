@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '../contexts/AppContext';
+import { useQuery } from "@tanstack/react-query";
+import * as apiClient from "../api-client";
+import { useLocation } from 'react-router-dom';
 
 const Contact = () => {
   const { showToast } = useToast();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const reason = searchParams.get('reason');
+  
+  // Fetch current user data to pre-fill the form
+  const { data: currentUser } = useQuery({
+    queryKey: ["getCurrentUser"],
+    queryFn: apiClient.getCurrentUser,
+    // Don't attempt if not logged in
+    enabled: localStorage.getItem('cancelBookingRef') !== null || reason === 'cancel-booking',
+    retry: false
+  });
+
   const [formState, setFormState] = useState({
     name: '',
     email: '',
@@ -10,6 +26,31 @@ const Contact = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Set initial values when component mounts or when reason/user changes
+  useEffect(() => {
+    if (reason === 'cancel-booking') {
+      // Get booking details from localStorage
+      const bookingRef = localStorage.getItem('cancelBookingRef');
+      const hotelName = localStorage.getItem('cancelHotelName');
+      
+      // Pre-fill the form for booking cancellation
+      setFormState(prev => ({
+        ...prev,
+        subject: 'Booking Cancellation',
+        message: `I would like to request a cancellation for my booking:\n\nBooking Reference: ${bookingRef || '[Reference not found]'}\nHotel: ${hotelName || '[Hotel name not found]'}\n\nPlease process this cancellation at your earliest convenience.`
+      }));
+      
+      // Pre-fill user details if available
+      if (currentUser) {
+        setFormState(prev => ({
+          ...prev,
+          name: `${currentUser.firstName} ${currentUser.lastName}`,
+          email: currentUser.email
+        }));
+      }
+    }
+  }, [reason, currentUser]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -29,6 +70,13 @@ const Contact = () => {
         message: "Your message has been sent! We'll get back to you soon.", 
         type: "SUCCESS" 
       });
+      
+      // Clear booking cancellation data from localStorage
+      if (reason === 'cancel-booking') {
+        localStorage.removeItem('cancelBookingRef');
+        localStorage.removeItem('cancelHotelName');
+      }
+      
       setFormState({
         name: '',
         email: '',
@@ -94,6 +142,7 @@ const Contact = () => {
                 <option value="Booking Inquiry">Booking Inquiry</option>
                 <option value="Property Listing">Property Listing</option>
                 <option value="Technical Support">Technical Support</option>
+                <option value="Booking Cancellation">Booking Cancellation</option>
                 <option value="Feedback">Feedback</option>
                 <option value="Other">Other</option>
               </select>
@@ -132,7 +181,7 @@ const Contact = () => {
             <h2 className="text-2xl font-bold mb-4 text-orange-600">Get in Touch</h2>
             <p className="text-gray-700 mb-6">
               We'd love to hear from you! Whether you have a question about booking, want to list your property,
-              or just want to say hello, we're here to help.
+              need to cancel a booking, or just want to say hello, we're here to help.
             </p>
             
             <div className="space-y-4">
