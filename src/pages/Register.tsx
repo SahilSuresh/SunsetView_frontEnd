@@ -22,6 +22,10 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
+  // State to track if registration was successful but requires verification
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  
   const { 
     register, 
     watch, 
@@ -31,19 +35,93 @@ const Register = () => {
 
   const mutation = useMutation({
     mutationFn: (data: RegisterFormData) => apiClient.register(data),
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      // Check if registration requires email verification
+      if (data.requiresVerification) {
+        setRegistrationComplete(true);
+        setRegisteredEmail(watch("email"));
+        showToast({
+          message: "Registration successful! Please check your email to verify your account.",
+          type: "SUCCESS"
+        });
+      } else {
+        // If no verification needed, proceed as before
         showToast({message: "Registration confirmed!", type:"SUCCESS"});
         await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
         navigate("/");
+      }
     },
     onError: (error: Error) => {
         showToast({ message: error.message, type: "ERROR" });
     },
   });
+  
+  // Handle resend verification email
+  const [resendingEmail, setResendingEmail] = useState(false);
+  
+  const handleResendVerification = async () => {
+    if (!registeredEmail) return;
+    
+    setResendingEmail(true);
+    try {
+      await apiClient.resendVerificationEmail(registeredEmail);
+      showToast({ 
+        message: "Verification email sent. Please check your inbox.", 
+        type: "SUCCESS" 
+      });
+    } catch (error) {
+      showToast({ 
+        message: error instanceof Error ? error.message : "Failed to resend verification email", 
+        type: "ERROR" 
+      });
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   const onSubmit = handleSubmit((data) => {
     mutation.mutate(data);
   });
+
+  // Show success message after registration
+  if (registrationComplete) {
+    return (
+      <div className="max-w-md mx-auto px-4 sm:px-6 py-8">
+        <div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Verify Your Email</h2>
+            <p className="text-gray-600 mb-6">
+              We've sent a verification email to <strong>{registeredEmail}</strong>.
+              Please check your inbox and click the verification link to complete your registration.
+            </p>
+            
+            <div className="mb-4 text-sm text-gray-600">
+              Didn't receive the email? Check your spam folder or click below to resend.
+            </div>
+            
+            <button
+              onClick={handleResendVerification}
+              disabled={resendingEmail}
+              className="bg-gradient-to-r from-orange-300 to-orange-500 text-white px-6 py-2 rounded-full font-bold hover:from-orange-400 hover:to-orange-600 transition-colors shadow-md disabled:opacity-70 mb-4"
+            >
+              {resendingEmail ? "Sending..." : "Resend Verification Email"}
+            </button>
+            
+            <div className="mt-4">
+              <Link to="/sign-in" className="text-orange-500 hover:text-orange-600 font-medium">
+                Back to Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto px-4 sm:px-6 py-8">

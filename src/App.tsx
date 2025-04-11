@@ -18,6 +18,10 @@ import Booking from "./pages/Booking";
 import MyBooking from "./pages/MyBooking";
 import Home from "./pages/Home";
 
+// New authentication pages
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 // Footer pages for "Explore" and "Company" sections
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
@@ -80,6 +84,25 @@ const App = () => {
           element={
             <Layout>
               <SignIn />
+            </Layout>
+          }
+        />
+        
+        {/* New authentication routes */}
+        
+        <Route
+          path="/forgot-password"
+          element={
+            <Layout>
+              <ForgotPassword />
+            </Layout>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <Layout>
+              <ResetPassword />
             </Layout>
           }
         />

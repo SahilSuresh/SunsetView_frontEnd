@@ -34,6 +34,8 @@ export const register = async (formData: RegisterFormData) => {
   if (!response.ok) {
     throw new Error(responseBody.message);
   }
+  
+  return responseBody;
 };
 
 export const signIn = async (formData: LoginFormData) => {
@@ -55,6 +57,16 @@ export const signIn = async (formData: LoginFormData) => {
 
 export const validateToken = async () => {
   try {
+    // Check if we're on a verification-related page and skip token validation if so
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/verify-email') || 
+        currentPath.includes('/reset-password') || 
+        currentPath.includes('/forgot-password')) {
+      console.log("Skipping token validation on public page");
+      // Return a mock successful response
+      return { isAuthenticated: false };
+    }
+    
     console.log("Validating authentication token");
     const response = await fetch(`${API_BASE_URL}/api/auth/validate-token`, {
       credentials: "include",
@@ -84,6 +96,52 @@ export const signOut = async () => {
   if (!response.ok) {
     throw new Error("Error during sign out");
   }
+};
+
+// Password reset related API calls
+export const requestPasswordReset = async (email: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/password/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to request password reset");
+  }
+  
+  return data;
+};
+
+export const validateResetToken = async (token: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/password/validate-token/${token}`);
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Invalid or expired token");
+  }
+  
+  return data;
+};
+
+export const resetPassword = async (token: string, password: string, confirmPassword: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/password/reset-password/${token}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password, confirmPassword }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to reset password");
+  }
+  
+  return data;
 };
 
 //fetch the add hotel
@@ -297,7 +355,6 @@ export const getHotelByIdBook = async (hotelId: string): Promise<HotelType> => {
 };
 
 // Create payment intent (updated for the latest Stripe version)
-// Create payment intent (updated for the latest Stripe version)
 export const createPaymentIntent = async (
   hotelId: string,
   numberOfNight: string,
@@ -389,7 +446,6 @@ export const createBooking = async (formData: BookingFormData) => {
     throw error;
   }
 }
-
 
 export const getBookings = async (): Promise<HotelType[]> => {
   const response = await fetch(`${API_BASE_URL}/api/my-bookings`, {

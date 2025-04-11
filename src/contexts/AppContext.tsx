@@ -30,11 +30,17 @@ const stripePromise = loadStripe(stripePublishableKey);
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toastMessage, setToastMessage] = useState<ToastMessage | undefined>(undefined);
 
-  const { isError } = useQuery({
-    queryKey: ["validateToken"],
-    queryFn: apiClient.validateToken,
-    retry: false
-  });
+  // Inside your ToastProvider component
+const { isError, data } = useQuery({
+  queryKey: ["validateToken"],
+  queryFn: apiClient.validateToken,
+  retry: false,
+  // Add this option to prevent automatic refetching when validation fails
+  refetchOnWindowFocus: false
+});
+
+// Determine if user is logged in based on the response
+const isLoggedIn = !isError && data?.isAuthenticated !== false;
 
   return (
     <AppContext.Provider
