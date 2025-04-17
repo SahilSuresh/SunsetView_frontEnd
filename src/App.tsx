@@ -1,3 +1,5 @@
+// Update to App.tsx - Add admin routes
+
 import {
   BrowserRouter as Router,
   Route,
@@ -6,33 +8,42 @@ import {
   useLocation,
 } from "react-router-dom";
 import Layout from "./interface/Interface";
-import Register from "./pages/Register";
-import SignIn from "./pages/SignIn";
+import Register from "./pages/auth/Register";
+import SignIn from "./pages/auth/SignIn";
 import { useToast } from "./contexts/AppContext";
-import AddHotel from "./pages/AddHotel";
-import MyHotel from "./pages/MyHotel";
-import EditHotel from "./pages/EditHotel";
-import Search from "./pages/Search";
-import DetailSec from "./pages/DetailSec";
-import Booking from "./pages/Booking";
-import MyBooking from "./pages/MyBooking";
+import AddHotel from "./pages/hotel/AddHotel";
+import MyHotel from "./pages/hotel/MyHotel";
+import EditHotel from "./pages/hotel/EditHotel";
+import Search from "./pages/search/Search";
+import DetailSec from "./pages/hotel/DetailSec";
+import Booking from "./pages/booking/Booking";
+import MyBooking from "./pages/booking/MyBooking";
 import Home from "./pages/Home";
 
 // New authentication pages
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // Footer pages for "Explore" and "Company" sections
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import Careers from "./pages/Careers";
-import AllHotels from "./pages/AllHotels";
-import FeaturedStays from "./pages/FeaturedStays";
-import TrendingDestinations from "./pages/TrendingDestinations";
-import HotelBookings from "./pages/HotelBookings ";
+import AboutUs from "./pages/info/AboutUs";
+import Contact from "./pages/info/Contact";
+import Careers from "./pages/info/Careers";
+import AllHotels from "./pages/hotel/AllHotels";
+import FeaturedStays from "./pages/hotel/FeaturedStays";
+import TrendingDestinations from "./pages/hotel/TrendingDestinations";
+import HotelBookings from "./pages/booking/HotelBookings ";
+
+// Admin components
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard"
+import AdminUsers from "./pages/admin/Users";
+import AdminHotels from "./pages/admin/Hotels";
+import AdminHotelDetail from "./pages/admin/HotelDetail";
+import AdminBookings from "./pages/admin/Bookings";
+import AdminMessages from "./pages/admin/Messages";
 
 const App = () => {
-  const { isLoggedIn } = useToast();
+  const { isLoggedIn, isAdmin } = useToast();
 
   // Create a wrapper component that can access location for redirects
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -43,9 +54,19 @@ const App = () => {
     return <>{children}</>;
   };
 
+  // Create an admin-only route wrapper
+  const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+    const location = useLocation();
+    if (!isLoggedIn || !isAdmin) {
+      return <Navigate to="/" />;
+    }
+    return <>{children}</>;
+  };
+
   return (
     <Router>
       <Routes>
+        {/* Main Site Routes */}
         <Route
           path="/"
           element={
@@ -89,8 +110,7 @@ const App = () => {
           }
         />
 
-        {/* New authentication routes */}
-
+        {/* Authentication routes */}
         <Route
           path="/forgot-password"
           element={
@@ -223,7 +243,22 @@ const App = () => {
           }
         />
 
-        {/* Note: Privacy Policy, Terms of Service, and Cookie Policy are now handled by modals instead of routes */}
+        {/* Admin Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="hotels" element={<AdminHotels />} />
+          <Route path="hotels/:hotelId" element={<AdminHotelDetail />} />
+          <Route path="bookings" element={<AdminBookings />} />
+          <Route path="messages" element={<AdminMessages />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

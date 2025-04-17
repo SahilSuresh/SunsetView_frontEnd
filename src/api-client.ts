@@ -1,5 +1,5 @@
-import { RegisterFormData } from "./pages/Register";
-import { LoginFormData } from "./pages/SignIn";
+import { RegisterFormData } from "./pages//auth/Register";
+import { LoginFormData } from "./pages/auth/SignIn";
 import {
   HotelType,
   PaymentIntentResponse,
@@ -235,7 +235,7 @@ export type SearchParameter = {
   childrenCount?: string;
   page?: string;
   // New filters
-  rating?: string;
+  rating?: string | string[]; // Updated to allow array of ratings
   type?: string | string[]; // Allow multiple hotel types
   facilities?: string[];
   sortOption?:
@@ -258,9 +258,17 @@ export const searchHotels = async (
   queryParameter.append("childrenCount", params.childrenCount || "");
   queryParameter.append("page", params.page || "");
 
-  // Add new filter parameters
+  // Add rating filter parameters - UPDATED to handle array
   if (params.rating) {
-    queryParameter.append("rating", params.rating);
+    if (Array.isArray(params.rating)) {
+      // Handle multiple ratings
+      params.rating.forEach((rating) => {
+        queryParameter.append("rating", rating);
+      });
+    } else {
+      // Handle single rating
+      queryParameter.append("rating", params.rating);
+    }
   }
 
   // Handle hotel type (can be string or array)
@@ -472,5 +480,187 @@ export const getHotelBookings = async (hotelId: string): Promise<HotelType> => {
     throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
   }
 
+  return response.json();
+};
+
+
+
+// Add to api-client.ts - Admin API endpoints
+
+// Admin dashboard stats
+export const getAdminDashboardStats = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching admin dashboard stats");
+  }
+  
+  return response.json();
+};
+
+// Get all users
+export const getAdminUsers = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching users");
+  }
+  
+  return response.json();
+};
+
+// Delete a user
+export const deleteUser = async (userId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error deleting user");
+  }
+  
+  return response.json();
+};
+
+// Get all hotels for admin
+export const getAdminHotels = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/hotels`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching hotels");
+  }
+  
+  return response.json();
+};
+
+// Get admin hotel by ID
+export const getAdminHotelById = async (hotelId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/hotels/${hotelId}`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching hotel details");
+  }
+  
+  return response.json();
+};
+
+// Get all bookings for admin
+export const getAdminBookings = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/bookings`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching bookings");
+  }
+  
+  return response.json();
+};
+
+
+
+
+// Add this function to your api-client.ts file
+
+// Delete a hotel (admin only)
+export const deleteAdminHotel = async (hotelId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/admin/hotels/${hotelId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error deleting hotel");
+  }
+  
+  return response.json();
+};
+
+
+// Add to api-client.ts
+
+// Submit contact form (with optional booking cancellation)
+export const submitContactForm = async (formData: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  bookingId?: string;
+}) => {
+  const response = await fetch(`${API_BASE_URL}/api/contact`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include", // Include cookies for authenticated requests
+    body: JSON.stringify(formData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to submit form");
+  }
+
+  return response.json();
+};
+
+
+
+// Add these functions to your api-client.ts file
+
+// Get all admin messages
+export const getAdminMessages = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/contact`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error fetching messages");
+  }
+  
+  return response.json();
+};
+
+// Mark message as read
+export const markMessageAsRead = async (messageId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/contact/${messageId}/read`, {
+    method: "PATCH",
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Error marking message as read");
+  }
+  
+  return response.json();
+};
+
+// Process cancellation request
+export const processCancellationRequest = async (messageId: string, status: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/contact/${messageId}/process-cancellation`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ status }),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error processing cancellation request");
+  }
+  
   return response.json();
 };

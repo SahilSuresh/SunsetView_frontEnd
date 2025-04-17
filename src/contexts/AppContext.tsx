@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import Toast from "../components/Toast";
+import React, { useContext, useState, useEffect } from "react";
+import Toast from "../components/common/Toast";
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from '../api-client';
 import { loadStripe, Stripe } from "@stripe/stripe-js";
@@ -13,10 +13,11 @@ type ToastMessage = {
   type: "SUCCESS" | "ERROR";
 };
 
-// Define context type
+// Define context type - Updated to include isAdmin
 type AppContext = {
   showToast: (toastMessage: ToastMessage) => void;
   isLoggedIn: boolean;
+  isAdmin: boolean; // For admin status
   stripePromise: Promise<Stripe | null>;
 };
 
@@ -30,17 +31,31 @@ const stripePromise = loadStripe(stripePublishableKey);
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toastMessage, setToastMessage] = useState<ToastMessage | undefined>(undefined);
 
-  // Inside your ToastProvider component
-const { isError, data } = useQuery({
-  queryKey: ["validateToken"],
-  queryFn: apiClient.validateToken,
-  retry: false,
-  // Add this option to prevent automatic refetching when validation fails
-  refetchOnWindowFocus: false
-});
+  // Inside your ToastProvider component - updated to properly handle isAdmin
+  const { isError, data, refetch } = useQuery({
+    queryKey: ["validateToken"],
+    queryFn: apiClient.validateToken,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true
+  });
 
-// Determine if user is logged in based on the response
-const isLoggedIn = !isError && data?.isAuthenticated !== false;
+  // Add a side effect to log authentication data for debugging
+  useEffect(() => {
+    console.log("Auth data:", { isError, data });
+    console.log("isAdmin status:", data?.isAdmin);
+  }, [isError, data]);
+
+  // Determine if user is logged in based on the response
+  const isLoggedIn = !isError && data?.userId !== undefined;
+  
+  // Determine if user is an admin - ensure we check for exactly true
+  const isAdmin = !isError && data?.isAdmin === true;
+
+  // For debugging in development
+  if (process.env.NODE_ENV !== 'production') {
+    console.log("Auth state:", { isLoggedIn, isAdmin, data });
+  }
 
   return (
     <AppContext.Provider
@@ -48,7 +63,8 @@ const isLoggedIn = !isError && data?.isAuthenticated !== false;
         showToast: (message: ToastMessage) => {
           setToastMessage(message);
         },
-        isLoggedIn: !isError,
+        isLoggedIn,
+        isAdmin,
         stripePromise
       }}
     >
