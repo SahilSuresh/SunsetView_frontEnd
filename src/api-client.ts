@@ -468,7 +468,21 @@ export const getBookings = async (): Promise<HotelType[]> => {
 };
 
 
-// Add this function to your api-client.ts file
+
+export const deleteHotel = async (hotelId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+    throw new Error(errorData.message || "Failed to delete hotel");
+  }
+
+  return response.json();
+};
+
 
 export const getHotelBookings = async (hotelId: string): Promise<HotelType> => {
   const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}/bookings`, {

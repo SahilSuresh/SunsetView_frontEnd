@@ -127,6 +127,8 @@ const App = () => {
             </Layout>
           }
         />
+        
+        
 
         {/* Hotel booking route - protected with location handling */}
         <Route

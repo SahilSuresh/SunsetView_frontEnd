@@ -37,8 +37,8 @@ const Footer = () => {
                                     <Link to="/hotels" className="text-white/90 hover:text-white transition-colors text-sm">
                                         All Hotels
                                     </Link>
-                                    <Link to="/featured" className="text-white/90 hover:text-white transition-colors text-sm">
-                                        Featured Stays
+                                    <Link to="/trending" className="text-white/90 hover:text-white transition-colors text-sm">
+                                        Tranding Destinations
                                     </Link>
                                     <Link to="/deals" className="text-white/90 hover:text-white transition-colors text-sm">
                                         Special Deals
